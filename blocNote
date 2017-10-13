@@ -1,0 +1,16 @@
+=============================================================
+Tri des compositeurs en fonction du nombre d'oeuvres
+
+Le quicksort marche direct sur la liste des compositeurs. 
+Il suffit de construire une liste tel que:
+liste[<number of tracks][<composers name>]
+lomQuicksort(liste, 0, len(liste)-1)
+
+et boom
+
+=============================================================
+DIVERS
+Et-ce que je créé un fichier 'classFpA-atiam.py' avec toutes les fonctions
+auxiliaires expliquées, commentées, avec les sources des pseudo codes
+
+=============================================================
