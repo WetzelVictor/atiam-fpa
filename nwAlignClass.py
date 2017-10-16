@@ -81,9 +81,10 @@ class nwMatrix:
         # Fill Matrix
         self.computeScore()
 
-        self.pathList.append(self.findPaths('',self.N-1, self.M-1) )
+        self.findPaths('',self.N-1, self.M-1)
 
         print self.pathList
+
         #  =======
         # == END ==
         #  =======
@@ -124,21 +125,13 @@ class nwMatrix:
     
     def findPaths(self, path, i, j):
         if(not True in self.matrix[i][j].origin):
-            print str(i) + '-' + str(j)
-            print 'Path is ' + path
             self.pathList.append(path)
         else:
             if(self.matrix[i][j].origin[0]):
                 self.findPaths(path + 'v',i-1,j)
-                if(self.matrix[i][j].origin[1]):
-                    self.pathList.append(self.findPaths(path + 'd',i-1,j-1))
-                if(self.matrix[i][j].origin[2]):
-                    self.pathList.append(self.findPaths(path + 'h', i,j-1))
-            elif(self.matrix[i][j].origin[1]):
+            if(self.matrix[i][j].origin[1]):
                 self.findPaths(path + 'd',i-1,j-1)
-                if(self.matrix[i][j].origin[2]):
-                    self.pathList.append(self.findPaths(path + 'h', i,j-1))
-            elif(self.matrix[i][j].origin[2]):
+            if(self.matrix[i][j].origin[2]):
                 self.findPaths(path + 'h', i,j-1)
 
 
