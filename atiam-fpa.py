@@ -122,23 +122,31 @@ print('Score : ' + str(score))
 
 #%% Question 2 - Applying this to a collection of musical scores
 
+
 # Here an example: print all composers
-for composer,tracks in sorted(composers_tracks.items()):
-    if (len(tracks) >= 10):
-        print(composer + ' : ' + str(len(tracks)) + ' tracks.')
+# for composer,tracks in sorted(composers_tracks.items()):
+#     if (len(tracks) >= 10):
+#         print(composer + ' : ' + str(len(tracks)) + ' tracks.')
         
 '''
 
 Q-2.1 Sort the collection of composers by decreasing number of tracks
 
 '''
-# Creating a list[<number of tracks>][<composer's name>]
-Ncomp = len(composers)
-NtrackOrder = [[len(composers_track[composers[i]]),composers[i]] \
-                                for i in xrange(Ncomp)]
+#### Creating a list[<number of tracks>][<composer's name>]
+# Initialization
+Ncomposers = len(composers_tracks)
+NtrackOrder = [[0,''] for i in xrange(Ncomposers)]
 
-# Applying Lomuto's quicksort algorithm to the list
-aux.revQuicksort(NtrackOrder, 0, len(NtrackrOrder)-1)
+# Building
+i = 0
+for composer,tracks in sorted(composers_tracks.items()):
+    NtrackOrder[i][0], NtrackOrder[i][1] = len(tracks), composer
+    i = i + 1
+
+#### Sorting: Applying Lomuto's quicksort algorithm to the list
+aux.revQuicksort(NtrackOrder, 0, len(NtrackOrder)-1)
+
 '''
 
 Q-2.2 Apply the NW algorithm between all tracks of each composer
@@ -149,10 +157,10 @@ Q-2.2 Apply the NW algorithm between all tracks of each composer
 '''
 
 # How to save an object through pickle
-obj = math.pi
-filename = 'pi' + '_match.obj'; # replace 'pi' by trackname
-file_obj = open('data/'+ filename, 'w')
-pickle.dump(obj, file_obj)
+# obj = math.pi
+# filename = 'pi' + '_match.obj'; # replace 'pi' by trackname
+# file_obj = open('data/'+ filename, 'w')
+# pickle.dump(obj, file_obj)
 
 ################
 # YOUR CODE HERE
