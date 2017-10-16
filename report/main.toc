@@ -1,0 +1,6 @@
+\select@language {french}
+\contentsline {section}{\numberline {1}Impl\IeC {\'e}mentation de l'algorithme d'alignement de Neddleman-Wunsch}{1}{section.1}
+\contentsline {subsection}{\numberline {1.1}Objet: \textit {nw.slot}}{1}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}Objet: \textit {nw.matrix}}{1}{subsection.1.2}
+\contentsline {section}{\numberline {2}Op\IeC {\'e}rations sur la base de donn\IeC {\'e}e}{2}{section.2}
+\contentsline {subsection}{\numberline {2.1}Tri de la base de donn\IeC {\'e}e par ordre d\IeC {\'e}croissant du nombre de tracks}{2}{subsection.2.1}

@@ -1,0 +1,113 @@
+% ======= Réglages =======
+\input{config.tex}
+
+\title{Fondamentaux pour ATIAM: informatique}
+\author{Victor WETZEL}
+\date{\today{month}}						
+
+% ========================
+\begin{document}
+\title{}
+
+\lstset{
+        inputencoding=latin1,
+        basicstyle=\footnotesize\ttfamily,
+        showstringspaces=false,
+        showspaces=false,
+        numbers=left,
+        numberstyle=\footnotesize,
+        numbersep=9pt,
+        tabsize=2,
+        breaklines=true,
+        showtabs=false,
+        captionpos=b,
+        literate={é}{{\'e}}1 {è}{{\`e}}1 {ê}{{\^e}}1
+       }
+\input{title.tex}
+% Remove page numbers (and reset to 1)
+\newpage
+\tableofcontents
+
+\newpage
+\pagenumbering{arabic}% Arabic page numbers (and reset to 1)
+
+% ========================
+\section{Implémentation de l'algorithme d'alignement de Neddleman-Wunsch}
+L'objet de cette partie est de donner quelques éléments sur mon implémentation
+de l'algorithme de Needle-Wunsch.\\
+On rappelle que cet algorithme permet de trouver les meilleurs alignements de
+chaînes de charactères symboliques (?). L'algorithme s'appuie sur la
+construction d'une matrice de similarité entre les deux éléments que l'on veut
+aligner. J'ai opté pour une approche orientée objet. Un objet \textit{matrix}
+est créé pour chaque alignement. Cet objet contient les méthodes permettant de
+résoudre l'algorithme d'alignement et d'obtenir une liste de tous les
+alignements possibles trié par ordre décroissant de score: le meilleur est en
+tête de liste.
+
+\subsection{Objet: \textit{nw.slot}}
+Chaque emplacement de la matrice contient un objet \textit{slot}. Ses variables
+de champs sont:
+\begin{itemize}
+  \item{Un couple de symboles} il s'agit des deux caractères que l'on aligne à
+    cet endroit particulier de la matrice.
+  \item{Une pénalité} Score à retrancher aux cases adjacentes en fonction d'une
+    correspondance ou non-correspondance des deux
+    caractères (\textit{match} ou \textit{mismatch})
+  \item{Un score} Calculé en fonction des case: en haut, en haut à gauche,
+    à gauche. à chacune des cases adjacentes listées est ajoutée une
+    pénalité en fonction de. Le score de la case est le
+    maximum de ces trois sous-scores.
+  \item{Une direction}  L'algorithme mémorise l'origine de ce score. 
+\end{itemize}
+
+\subsection{Objet: \textit{nw.matrix}}
+La matrice elle même est un objet. Les variables de champs sont:
+\begin{itemize}
+  \item{matrix} la matrice de similarité contenant les \textit{slot}
+  \item{N et M} caractérisent la taille de la matrice
+  \item{path} Liste tous les alignements possibles
+  \item{strA strB} Les chaînes de symboles que l'on compare
+\end{itemize}
+
+% =============
+% ==== BDD ====
+\newpage
+\section{Opérations sur la base de donnée}
+\subsection{Tri de la base de donnée par ordre décroissant du nombre de tracks}
+Dans cette partie, j'ai implémentée l'algorithme de \textit{quicksort} de
+Lomuto, en inversant l'ordre du tri. Le pseudo code de l'algorithme original 
+est disponible sur la page
+wikipédia (https://en.wikipedia.org/wiki/Quicksort), listé ci-dessous:
+
+\hspace{10pt}
+\begin{lstlisting}[style=customPseudo, caption=Algorithme quicksort de Lomuto]
+algorithm quicksort(A, lo, hi) is
+    if lo < hi then
+        p := partition(A, lo, hi)
+        quicksort(A, lo, p-1)
+        quicksort(A, p + 1, hi)
+
+algorithm partition(A, lo, hi) is
+    pivot := A[hi]
+    i := lo - 1    
+    for j := lo to hi - 1 do
+        if A[j] < pivot then
+            i := i + 1
+            swap A[i] with A[j]
+    if A[hi] < A[i + 1] then
+        swap A[i + 1] with A[hi]
+    return i + 1
+\end{lstlisting}
+
+Pour trier la base de donnée, on créé une matrice dont la première colonne contient le
+nombre de track de chaque artiste, la deuxième contenant le nom de l'artiste.
+Il suffit alors d'appliquer la fonction \textit{revQuicksort} sur cette liste
+afin de la trier dans l'ordre décroissant du nombre de tracks.
+
+% ========================
+\newpage
+\bibliographystyle{plain}
+\bibliography{bibliographie.bib}
+
+
+\end{document}

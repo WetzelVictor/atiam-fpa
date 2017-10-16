@@ -52,25 +52,25 @@ class nwMatrix:
         self.strLeft, self.strTop = strLeft, strTop 
         # Penalty for match and mismatch
         self.pMatch, self.pMismatch = pMatch, pMismatch
-
+        
+        # List of paths
+        self.pathList = []
 
         # Creating dummy Matrix
         self.matrix = [[slot() for i in xrange(self.M)] for j in \
                                                             xrange(self.N)]
         self.initMatrix()
 
-        # Fill the Matrix
-        # self.computeScore(self.N-1, self.M-1)
-
-
     def initMatrix(self):
-        # Building the matrix
-        
         # Initializing scores
         for i in xrange(self.N):
             self.matrix[i][0].score, self.matrix[i][0].processed = -i,True
+            if i>0:
+                self.matrix[i][0].origin =[False, False, True]
         for i in xrange(1,self.M):
             self.matrix[0][i].score, self.matrix[0][i].processed = -i, True
+            if i>0:
+                self.matrix[i][0].origin =[True, False, False]
         
         # Match/Mismatch
         self.matchMatrix = (np.array([list(self.strLeft)]).transpose() \
@@ -79,15 +79,18 @@ class nwMatrix:
         # Assign Match/misMatch penalty
         self.assignPenalty()
         # Fill Matrix
-        self.computeScore(1,1)
-        self.computePaths(self.N, self.M) 
+        self.computeScore()
+
+        self.pathList.append(self.findPaths('',self.N-1, self.M-1) )
+
+        print self.pathList
         #  =======
         # == END ==
         #  =======
 
 
     def printMatrix(self):
-        print "NW Mtrix"
+        print "NW Matrix"
         print np.array([[self.matrix[j][i].score for i in xrange(self.M)] \
                                                  for j in xrange(self.N)])
 
@@ -96,23 +99,20 @@ class nwMatrix:
         print np.array([[self.matrix[j][i].penalty for i in xrange(self.M)] \
                                                    for j in xrange(self.N)])
 
-    def computeScore(self, i, j):
-        if(i == self.N or j == self.M):
-            return None
-        
-        adjacents = np.array([self.matrix[i-1][j].score,   \
+    def computeScore(self):
+        for i in xrange(1, self.N):
+            for j in xrange(1, self.M):
+                adjacents = np.array([self.matrix[i-1][j].score,   \
                               self.matrix[i-1][j-1].score, \
                               self.matrix[i][j-1].score])
-        # print adjacents
-        # if( None in adjacents):
-            # return None
-
-        self.matrix[i][j].score = max(adjacents) + self.matrix[i][j].penalty
-        self.origin = (adjacents == self.matrix[i][j].score)
-        
-        self.computeScore(i,j+1)
-        self.computeScore(i+1,j)
-
+                
+                self.matrix[i][j].score = max(adjacents) + self.matrix[i][j].penalty
+                self.matrix[i][j].origin = (adjacents + \
+                                            self.matrix[i][j].penalty == \
+                                            self.matrix[i][j].score)
+                 
+                if not True in self.matrix[i][j].origin:
+                    print str(i) + '-' + str(j)
 
     def assignPenalty(self):
         for i in xrange(self.N-1):
@@ -122,43 +122,24 @@ class nwMatrix:
                 else:
                     self.matrix[i+1][j+1].penalty = self.pMismatch
     
-    def computePaths(self, i, j, ID=0, path=[]):
-        if( i==1 and j==1):
-            return path
+    def findPaths(self, path, i, j):
+        if(not True in self.matrix[i][j].origin):
+            print str(i) + '-' + str(j)
+            print 'Path is ' + path
+            self.pathList.append(path)
         else:
             if(self.matrix[i][j].origin[0]):
-                self.computePaths(self, i-1,j, path + 'v')
-                print 'v'
+                self.findPaths(path + 'v',i-1,j)
+                if(self.matrix[i][j].origin[1]):
+                    self.pathList.append(self.findPaths(path + 'd',i-1,j-1))
+                if(self.matrix[i][j].origin[2]):
+                    self.pathList.append(self.findPaths(path + 'h', i,j-1))
             elif(self.matrix[i][j].origin[1]):
-                self.computePaths(self, i-1, j-1, path + 'd')
-                print 'd'
+                self.findPaths(path + 'd',i-1,j-1)
+                if(self.matrix[i][j].origin[2]):
+                    self.pathList.append(self.findPaths(path + 'h', i,j-1))
             elif(self.matrix[i][j].origin[2]):
-                self.computePaths(i, j-1, path + 'h',)
-                print 'h'
-        
+                self.findPaths(path + 'h', i,j-1)
 
-
-
-
-
-
-# =========== path ===========
-#
-# path: a pile that computes and stores a way in a nwMatrix (see previous class).
-#        /\
-#       /!!\ Can be build we a given begining in cae there is several choices
-#       ---- for the best score
-#
-#   FIELD VARIABLES:
-#       - score: score of the path. The path that has the best score is the one
-#       that we keep as best alignement.
-#       - path (array): keeps track of the path through the matrix
-
-# We need an array of stacks
-
-class path:
-    def __init__(self, path=[]):
-        self.score = 0
-        self.path = path
 
 
