@@ -16,7 +16,6 @@ DEV_MODE=False
 import os
 import pickle
 import string
-import auxFunctions as aux
 
 #%% Here collect the whole set of tracks
 if DEV_MODE:
@@ -101,9 +100,7 @@ Q-1.1 Here perform your Needleman-Wunsch (NW) implementation.
 '''
 import nwAlignClass as mynw
 def myNeedleman(str1, str2, matrix='atiam-fpa_alpha.dist', gap_open=-5, gap_extend=-5):
-    ################
-    # YOUR CODE HERE
-    ################
+    str1, str2 = str1.upper(), str2.upper()
     classAlignement = mynw.nwMatrix(str1, str2,simiMatrix='atiam-fpa_dna.dist', \
                    gap_open=gap_open, gap_extend=gap_extend)
     ali = classAlignement.bestAlignement
@@ -143,12 +140,14 @@ print('Score : ' + str(score))
 Q-2.1 Sort the collection of composers by decreasing number of tracks
 
 '''
+
+import auxFunctions as aux # auxilary file for fonctions
+
 #### Creating a list[<number of tracks>][<composer's name>]
 # Initialization
 Ncomposers = len(composers_tracks)
 NtrackOrder = [[0,''] for i in xrange(Ncomposers)]
 
-# Building
 i = 0
 for composer,tracks in sorted(composers_tracks.items()):
     NtrackOrder[i][0], NtrackOrder[i][1] = len(tracks), composer
@@ -172,9 +171,27 @@ Q-2.2 Apply the NW algorithm between all tracks of each composer
 # file_obj = open('data/'+ filename, 'w')
 # pickle.dump(obj, file_obj)
 
-################
-# YOUR CODE HERE
-################
+# Selecting composer
+composer = 'Beethoven, Ludwig van'
+# Builing a Nt*Nt matrix (Nt = number of tracks) containing scores
+Nt = len(composers_tracks[composer])
+tempTracks = composers_tracks[composer]
+trackSimi = [[None for i in xrange(Nt)] for j in xrange(Nt)]
+
+# Symmetric matrix, do not compute the diagonal
+avgScore=0
+for i in xrange(Nt):
+    track1 = tempTracks[i]
+    for j in xrange(i+1,Nt):
+        track2 = tempTracks[j]
+        ali = nw.global_align("CEELECANTH", "PELICAN", matrix='atiam-fpa_alpha.dist')
+        score = nw.score_alignment(ali[0], ali[1], \
+                gap_open=-5, gap_extend=-2, matrix='atiam-fpa_alpha.dist')
+        trackSimi[i][j] = score
+        avgScore += score
+
+avgScore /=Nt
+print avgScore
 
 '''
 
