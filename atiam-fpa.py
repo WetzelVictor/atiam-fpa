@@ -99,11 +99,21 @@ Q-1.1 Here perform your Needleman-Wunsch (NW) implementation.
     - Remember to rely on a user-defined matrix for symbols distance
 
 '''
+import nwAlignClass as mynw
 def myNeedleman(str1, str2, matrix='atiam-fpa_alpha.dist', gap_open=-5, gap_extend=-5):
     ################
     # YOUR CODE HERE
     ################
-    return ('', '')
+    classAlignement = mynw.nwMatrix(str1, str2,simiMatrix='atiam-fpa_dna.dist', \
+                   gap_open=gap_open, gap_extend=gap_extend)
+    ali = classAlignement.bestAlignement
+    return (ali[0], ali[1])
+
+print 'Performing alignement on CEELECANTH and PELICAN...'
+ali= myNeedleman('CEELECANTH','PELICAN')
+print ali[0]
+print ali[1]
+print ''
 
 # Reference code for testing
 import nwalign as nw
