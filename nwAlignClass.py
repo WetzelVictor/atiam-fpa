@@ -48,8 +48,9 @@ class nwMatrix:
     def __init__(self, strTop, strLeft, \
                        pMatch=1, pMismatch=-1,\
                        similarityMatrix=None,
-                       gap_open=-5,
-                       gap_extend=-2 ):
+                       gap_open=-10,
+                       gap_extend=-1,
+                       simiMatrix='atiam-fpa_alpha.dist'):
 
         # Dimensions of the nwMatrix (N:rows, M:columns)
         self.N, self.M = len(strLeft)+1, len(strTop)+1
@@ -57,7 +58,9 @@ class nwMatrix:
         self.strLeft, self.strTop = strLeft, strTop 
         # Penalty for match and mismatch
         self.pMatch, self.pMismatch = pMatch, pMismatch
+        self.gap_open, self.gap_extend = gap_open, gap_extend
         
+
         # List of paths
         self.pathList = []
 
@@ -86,10 +89,19 @@ class nwMatrix:
 
         # List of possible alignements
         self.alignements = [['',''] for i in xrange(len(self.pathList))]
+        self.scores = [None for i in xrange(len(self.pathList))]
         self.makeAlignements()
 
-        # self.gap_open, self.gap_extend = gap_open, gap_extend
+        self.simi = {}
+        self.simiDict(simiMatrix)
+        self.scoreAlignements()
+        
+        # print 'Best Alignement: ' + str(max(self.scores))
+        # print self.alignements[np.argmax(self.scores)][0]
+        # print self.alignements[np.argmax(self.scores)][1]
 
+        self.bestAlignement = self.alignements[np.argmax(self.scores)]
+        
     def initMatrix(self):
         # Initializing scores
         for i in xrange(self.N):
@@ -153,13 +165,6 @@ class nwMatrix:
                     iT = iT + 1
             # Storing
             self.alignements[i] = [al1, al2]
-            print 'Alignement ' + str(i) + ':'
-            print al1
-            print al2
-            print ''
-    
-    def scorePaths(self, sMatrix='atiam-fpa_alpha.dist'):
-        return 0
 
     def printMatrix(self):
         print "NW Matrix"
@@ -172,8 +177,101 @@ class nwMatrix:
                                                    for j in xrange(self.N)])
             
 
+    def simiDict(self,fileName):
+        dist = open(fileName)
+        with dist as f:
+                lineCount = sum(1 for _ in f)
+
+        dist = open(fileName)
+        simiMatrix = [[] for i in xrange(lineCount)]
+
+        for i in xrange(lineCount):
+            if i ==0:
+                line = list(dist.readline())
+            else:
+                line= list(dist.readline((i+4)*(lineCount-1)))
+            
+            if i !=0:
+                line[0:1]=[]
+
+            while(True):
+                try:
+                    ind = line.index(' ')
+                except ValueError:
+                    break
+                line[ind:ind+1]=[]
+            
+            while(True):
+                try:
+                    ind = line.index('-')
+                except ValueError:
+                    break
+                line[ind:ind+1]=[]
+                line[ind] = '-' + line[ind]
+            try:
+                ind = line.index('\n')
+            except ValueError:
+                print 'oups %i' % (i)
+
+            line[ind:ind+1] = []
+            simiMatrix[i] = line
+
+        self.simi = {}
+
+        for i,line in enumerate(simiMatrix):
+            for j,letter in enumerate(simiMatrix[0]):
+                try:
+                    key = simiMatrix[0][i] + letter
+                    score = line[j]
+                except IndexError:
+                    break
+                try:
+                    self.simi[key] = int(score)
+                except ValueError:
+                    score = simiMatrix[i+1][j]
+                    self.simi[key] = int(score)
+
+        for i,letter in enumerate(simiMatrix[0]):
+            for j,letter in enumerate(simiMatrix[0]):
+                try:
+                    key= letter + letter
+                    self.simi[key]
+                except:
+                    print 'Didn\'t found %s' % (key)
+
+
+    def scoreAlignements(self):
+        for i,ali in enumerate(self.alignements):
+            #init
+            score = 0
+            gap_open1, gap_open2 = True, True
+            # print ali
+
+            for j in xrange(len(ali[0])):
+                l1, l2 = ali[0][j], ali[1][j]
                 
-
-                    
-
+                if l1 == '-':
+                    if gap_open1:
+                        score += self.gap_open
+                        gap_open1= False
+                    else:
+                        score += self.gap_extend
+                elif l2 == '-':
+                    if gap_open2:
+                        score += self.gap_open
+                        gap_open2= False
+                    else:
+                        score += self.gap_extend
+                else:
+                    gap_open1, gap_open2 = True, True
+                    try:
+                        key = l1+l2
+                        score += self.simi[key]
+                    except KeyError:
+                        if l1 == l2:
+                            score += self.pMatch
+                        else:
+                            score += self.pMismatch 
+            
+            self.scores[i] = score;
 
